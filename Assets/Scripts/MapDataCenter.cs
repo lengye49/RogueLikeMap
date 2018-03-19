@@ -6,43 +6,118 @@ using System;
 public class MapDataCenter{
 	private int rowsCount;//thisMap.Rows
 	private int columnsCount;//thisMap.Columns
-    private MapInfo thisMapInfo;
+	private MapInfo mapInfo;
 	private Grid[,] gridList;
 		
+
+
 	//public MapDataCenter(Map m)
 	public MapDataCenter(int row,int column){
 		rowsCount = 10;
 		columnsCount = 10;
 		gridList = new Grid[row, column];
+		mapInfo = new MapInfo ("test.map");
 		InitMapData ();
 	}
 
 	void InitMapData(){
-		
+		int bossNum = CalculateMethod.GetRandomValue (mapInfo.BossRange);
+		int monsterNum = CalculateMethod.GetRandomValue (mapInfo.MonsterRange);
+		int eventNum = CalculateMethod.GetRandomValue (mapInfo.EventRange);
+		int blockNum = CalculateMethod.GetRandomValue (mapInfo.BlockRange);
+		List<Grid> gridPicked = new List<Grid> ();
+
+		int r1 = CalculateMethod.GetRandomValue (0, rowsCount);
+		int r2 = CalculateMethod.GetRandomValue (0, columnsCount);
+		Grid startPoint = gridList [r1, r2];
+		gridPicked.Add (startPoint);
+
+		List<Grid> neighbours;
+		Grid thisGrid;
+		Grid nextGrid;
+		List<Grid> ends;
+		do {
+			for (int i = 0; i < rowsCount * columnsCount - blockNum; i++) {
+				//随机选取当前点
+				thisGrid = RandomGrid (gridPicked);
+				//查找临点
+				do {
+					neighbours = GridNeighbour (thisGrid);
+					for (int j = 0; j < gridPicked.Count; j++) {
+						if (neighbours.Contains (gridPicked [j]))
+							neighbours.Remove (gridPicked [j]);
+					}
+				} while(neighbours.Count == 0);
+				//从临点中选取下一点
+				nextGrid = RandomGrid (neighbours);
+				gridPicked.Add (nextGrid);
+
+			}
+			ends = EndPoints (gridPicked);
+		} while(ends.Count < bossNum + 1);
+
+		List<Grid> bossPoints = RandomGridList (ends, bossNum);
+		RemoveExist (ref gridPicked, ref bossPoints);
+		RemoveExist (ref ends, ref bossPoints);
+		List<Grid> enterPoints = RandomGridList (ends, 1);
+		RemoveExist (ref gridPicked, ref enterPoints);
+		List<Grid> monsterPoints = RandomGridList (gridPicked, monsterNum);
+		RemoveExist (ref gridPicked, ref monsterPoints);
+		List<Grid> eventPoints = RandomGridList (gridPicked, eventNum);
+		RemoveExist (ref gridPicked, ref eventPoints);
+		List<Grid> emptyPoints = gridPicked;
 
 	}
-			
-		//测试代码
-//		for (int i = 0; i < rowsCount; i++) {
-//			for (int j = 0; j < columnsCount; j++) {
-//				GenerateNewGrid (i, j);
-//			}
-//		}
-//	}
-	//测试代码
-//	void GenerateNewGrid(int x,int y){
-//		gridList [x, y] = new Grid (x, y);
-//		gridList [x, y].type = GridType.Normal;
-//		if (x == 1 && y <4)
-//			gridList [x, y].type = GridType.Block;
-//		if(x==3 && y>0)
-//			gridList [x, y].type = GridType.Block;
-//		if(x==6 && y<4)
-//			gridList [x, y].type = GridType.Block;
-//		if(x==8 && y>4)
-//			gridList [x, y].type = GridType.Block;
-//	}
 
+	void RemoveExist(ref List<Grid> org,ref List<Grid> exist){
+		for (int i = 0; i < exist.Count; i++) {
+			try{
+				org.Remove (exist [i]);
+			}catch(Exception e){
+				Debug.Log (e);
+			}
+		}
+	}
+
+	List<Grid> RandomGridList(List<Grid> gridPool,int requestNum){
+		List<Grid> gl = new List<Grid> ();
+		List<Grid> gp = gridPool;
+		for(int i=0;i<requestNum;i++){
+			Grid g = RandomGrid (gp);
+			gl.Add (g);
+			gp.Remove (g);
+		}
+		return gl;
+	}
+
+	Grid RandomGrid(List<Grid> gridPool){
+		int r = CalculateMethod.GetRandomValue (0, gridPool.Count);
+		return gridPool [r];
+	}
+
+	/// <summary>
+	/// 查找端点：只联通一个点的点
+	/// </summary>
+	/// <returns>The points.</returns>
+	/// <param name="pickedPoints">Picked points.</param>
+	List<Grid> EndPoints(List<Grid> orgs){
+		List<Grid> ends = new List<Grid> ();
+		List<Grid> neighbours = new List<Grid> ();
+		int num;
+		for (int i = 0; i < orgs.Count; i++) {
+			num = 0;
+			neighbours = GridNeighbour (orgs [i]);
+			for (int j = 0; j < neighbours.Count; j++) {
+				if (orgs.Contains (neighbours [j]))
+					num++;
+			}
+			if (num == 1)
+				ends.Add (orgs [i]);
+			if (num == 0)
+				Debug.Log ("Impossible!");
+		}
+		return ends;
+	}
 
 	private ArrayList openList;
 	private ArrayList closeList;
@@ -97,7 +172,13 @@ public class MapDataCenter{
 				Debug.Log ("UnReachable Point!");
 		}
 	}
-		
+
+	void GenerateRoad(Grid g){
+		road += "(" + g.x + "," + g.y + ")";
+		if (g.parent != null)
+			GenerateRoad (g.parent);
+	}	
+
 	List<Grid> GridNeighbour(Grid org){
 		List<Grid> neighbour = new List<Grid> ();
 		if (org.x != 0)
@@ -109,12 +190,6 @@ public class MapDataCenter{
 		if (org.y != rowsCount - 1)
 			neighbour.Add (gridList [org.x, org.y + 1]);
 		return neighbour;
-	}
-
-	void GenerateRoad(Grid g){
-		road += "(" + g.x + "," + g.y + ")";
-		if (g.parent != null)
-			GenerateRoad (g.parent);
 	}
 
 }
@@ -146,6 +221,7 @@ class Grid : IComparable{
 	}
 
 }
+	
 
 enum GridType{
 	Block = 99,

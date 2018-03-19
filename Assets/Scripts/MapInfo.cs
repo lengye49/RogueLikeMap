@@ -3,13 +3,15 @@ public class MapInfo{
 	public string MapName;//地图的图片
 	public int Rows;
 	public int Columns;
-	public string BossCount;//格式 1|8 1~8随机
+	public string BossRange;//格式 1|8 1~8随机
 	public Dictionary<int,int> BossList;
 
-	public string MonsterCount;//格式 1|8 1~8随机
+	public string BlockRange;//格式 1|8 1~8随机
+
+	public string MonsterRange;//格式 1|8 1~8随机
 	public Dictionary<int,int> MonsterList;
 
-	public string EventCount;//格式 1|8 1~8随机
+	public string EventRange;//格式 1|8 1~8随机
 	public Dictionary<int,int> EventConfirmed;//id,数量
 	public Dictionary<int,int> EventPossible;//id,权重
 	/*	任务、特殊任务
