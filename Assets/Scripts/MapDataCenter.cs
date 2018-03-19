@@ -6,7 +6,7 @@ using System;
 public class MapDataCenter{
 	private int rowsCount;//thisMap.Rows
 	private int columnsCount;//thisMap.Columns
-	private Map thisMap;
+    private MapInfo thisMapInfo;
 	private Grid[,] gridList;
 		
 	//public MapDataCenter(Map m)
@@ -18,9 +18,7 @@ public class MapDataCenter{
 	}
 
 	void InitMapData(){
-		int bossNum = CalculateMethod.GetRandomValue (thisMap.BossCount);
-		int monsterNum = CalculateMethod.GetRandomValue (thisMap.MonsterCount);
-		int eventNum = CalculateMethod.GetRandomValue (thisMap.EventCount);
+		
 
 	}
 			

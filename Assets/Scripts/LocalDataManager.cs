@@ -3,7 +3,7 @@ using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-public class DataManager : MonoBehaviour  {
+public class LocalDataManager : MonoBehaviour  {
 	public static PlayerInfo _player;
 	void Awake(){
 		_player = new PlayerInfo ();

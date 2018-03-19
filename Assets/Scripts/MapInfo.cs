@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-public class Map{
+public class MapInfo{
 	public string MapName;//地图的图片
 	public int Rows;
 	public int Columns;
@@ -19,8 +19,14 @@ public class Map{
 	 *	删卡（顿悟）
 	 * */
 
-	public Map(string mapId){
-		
+	public MapInfo(string mapId){
+		//根据mapId读取对应的数据
 	}
 }
+
+public class Map{
+    
+}
+
+
 
