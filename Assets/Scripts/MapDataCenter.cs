@@ -12,19 +12,23 @@ public class MapDataCenter{
 
 
 	//public MapDataCenter(Map m)
-	public MapDataCenter(int row,int column){
-		rowsCount = 10;
-		columnsCount = 10;
-		gridList = new Grid[row, column];
-		mapInfo = new MapInfo ("test.map");
+	public MapDataCenter(){
+        mapInfo = new MapInfo ("test.map");
+		rowsCount = mapInfo.RowsCount;
+		columnsCount = mapInfo.ColumnsCount;
+		gridList = new Grid[rowsCount, columnsCount];
 		InitMapData ();
 	}
 
 	void InitMapData(){
 		int bossNum = CalculateMethod.GetRandomValue (mapInfo.BossRange);
+        Debug.Log("bossNum = " + bossNum);
 		int monsterNum = CalculateMethod.GetRandomValue (mapInfo.MonsterRange);
+        Debug.Log("monsterNum = " + monsterNum);
 		int eventNum = CalculateMethod.GetRandomValue (mapInfo.EventRange);
+        Debug.Log("eventNum = " + eventNum);
 		int blockNum = CalculateMethod.GetRandomValue (mapInfo.BlockRange);
+        Debug.Log("blockNum = " + blockNum);
 		List<Grid> gridPicked = new List<Grid> ();
 
 		int r1 = CalculateMethod.GetRandomValue (0, rowsCount);
@@ -56,17 +60,25 @@ public class MapDataCenter{
 			ends = EndPoints (gridPicked);
 		} while(ends.Count < bossNum + 1);
 
-		List<Grid> bossPoints = RandomGridList (ends, bossNum);
+        //这一部分直接把数据存到gridList里面即可
+        List<Grid> bossPoints = SetGridType (ref ends, bossNum,GridType.Boss);
 		RemoveExist (ref gridPicked, ref bossPoints);
 		RemoveExist (ref ends, ref bossPoints);
-		List<Grid> enterPoints = RandomGridList (ends, 1);
+        List<Grid> enterPoints = SetGridType (ref ends, 1,GridType.Enter);
 		RemoveExist (ref gridPicked, ref enterPoints);
-		List<Grid> monsterPoints = RandomGridList (gridPicked, monsterNum);
+        List<Grid> monsterPoints = SetGridType (ref gridPicked, monsterNum,GridType.Monster);
 		RemoveExist (ref gridPicked, ref monsterPoints);
-		List<Grid> eventPoints = RandomGridList (gridPicked, eventNum);
+        List<Grid> eventPoints = SetGridType (ref gridPicked, eventNum,GridType.Event);
 		RemoveExist (ref gridPicked, ref eventPoints);
-		List<Grid> emptyPoints = gridPicked;
+        List<Grid> emptyPoints = SetGridType(ref gridPicked, gridPicked.Count, GridType.Road);
 
+        for (int i = 0; i < gridList.GetLength(0); i++)
+        {
+            for (int j = 0; j < gridList.GetLength(1); j++)
+            {
+                Debug.Log("Grid " + i + "," + j + " type = " + gridList[i, j].type);
+            }
+        }
 	}
 
 	void RemoveExist(ref List<Grid> org,ref List<Grid> exist){
@@ -79,13 +91,13 @@ public class MapDataCenter{
 		}
 	}
 
-	List<Grid> RandomGridList(List<Grid> gridPool,int requestNum){
+    List<Grid> SetGridType(ref List<Grid> gridPool,int requestNum,GridType t){
 		List<Grid> gl = new List<Grid> ();
-		List<Grid> gp = gridPool;
 		for(int i=0;i<requestNum;i++){
-			Grid g = RandomGrid (gp);
+			Grid g = RandomGrid (gridPool);
+            gridList[g.x, g.y].type = t;
 			gl.Add (g);
-			gp.Remove (g);
+            gridPool.Remove (g);
 		}
 		return gl;
 	}
@@ -227,6 +239,10 @@ enum GridType{
 	Block = 99,
 	Covered = 0,
 	Road = 1,
-	Normal = 2
+	Normal = 2,
+    Boss=3,
+    Monster=4,
+    Event=5,
+    Enter=6
 }
 

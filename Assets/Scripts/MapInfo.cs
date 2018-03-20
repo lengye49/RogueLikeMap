@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 public class MapInfo{
 	public string MapName;//地图的图片
-	public int Rows;
-	public int Columns;
+	public int RowsCount;
+	public int ColumnsCount;
 	public string BossRange;//格式 1|8 1~8随机
 	public Dictionary<int,int> BossList;
 
@@ -22,7 +22,13 @@ public class MapInfo{
 	 * */
 
 	public MapInfo(string mapId){
-		//根据mapId读取对应的数据
+        MapName = mapId;
+        RowsCount = 10;
+        ColumnsCount = 10;
+        BossRange="1|1";
+        BlockRange="45|50";
+        MonsterRange="15|20";
+        EventRange="8|10";
 	}
 }
 
