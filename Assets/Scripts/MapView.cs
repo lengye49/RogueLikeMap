@@ -4,14 +4,70 @@ using UnityEngine;
 
 public class MapView : MonoBehaviour {
 
-    private Sprite mapCell;
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    private float mapWidth;
+    private float mapHeight;
+    private int mapRow;
+    private int mapColumn;
+    private float cellLength;
+    private Vector3 cellScale;
+    private Vector3 refPoint;
+
+    void Start(){
+        mapWidth = 1920;//width;
+        mapHeight = 1080;//height;
+        mapRow = 9;//rows;
+        mapColumn = 15;//columns;
+        cellLength = GetCellLength();
+        cellScale = GetCellScale();
+        this.refPoint = Vector3.zero;//refPoint;
+        DeployMapView();
+    }
+
+//    public MapView(){
+//    //(int width,int height,int rows,int columns,Vector3 refPoint){
+//        mapWidth = 1920;//width;
+//        mapHeight = 1080;//height;
+//        mapRow = 9;//rows;
+//        mapColumn = 15;//columns;
+//        cellLength = GetCellLength();
+//        cellScale = GetCellScale();
+//        this.refPoint = Vector3.zero;//refPoint;
+//        DeployMapView();
+//    }
+
+    public void DeployMapView(){
+        Object mapCell = Resources.Load("mapCell");
+        Transform _parent = this.gameObject.transform;
+        for (int i = 0; i < mapRow; i++)
+        {
+            for (int j = 0; j < mapColumn; j++)
+            {
+                GameObject c = Instantiate(mapCell) as GameObject;
+                c.transform.SetParent(_parent);
+                c.transform.localScale = cellScale;
+                c.transform.localPosition = CalculatePos(i, j);
+            }
+        }
+    }
+
+
+    float GetCellLength(){
+        float sideWidth = mapWidth / mapRow;
+        float sideHeight = mapHeight / mapColumn;
+        return Mathf.Max(sideWidth, sideHeight);
+    }
+
+    Vector3 GetCellScale(){
+        return new Vector3(cellLength / 128f, cellLength / 128f, 1f);
+    }
+
+    Vector3 CalculatePos(int thisRow,int thisColumn){
+        float x = refPoint.x;
+        x += (thisColumn - 0.5f - 0.5f * mapColumn) * cellLength/100f;
+        float y = refPoint.y;
+        y += (thisRow - 0.5f - 0.5f * mapRow) * cellLength/100f;
+
+        return new Vector3(x, y, 1f);
+    }
+
 }

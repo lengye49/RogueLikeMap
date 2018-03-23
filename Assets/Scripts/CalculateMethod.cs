@@ -43,12 +43,6 @@ public class CalculateMethod{
 		}
 		return -1;
 	}
-
-    //这个可以放到地图展示里
-    public static int GetGridSideLength(int row,int column,int width,int height){
-        int sideWidth = width / row;
-        int sideHeight = height / column;
-        return Mathf.Max(sideWidth, sideHeight);
-    }
+        
 }
 
