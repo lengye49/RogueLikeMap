@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MapView : MonoBehaviour {
 
@@ -52,9 +53,9 @@ public class MapView : MonoBehaviour {
 
 
     float GetCellLength(){
-        float sideWidth = mapWidth / mapRow;
-        float sideHeight = mapHeight / mapColumn;
-        return Mathf.Max(sideWidth, sideHeight);
+        float sideWidth = mapWidth / mapColumn;
+        float sideHeight = mapHeight / mapRow;
+		return Mathf.Min(sideWidth, sideHeight);
     }
 
     Vector3 GetCellScale(){
@@ -63,9 +64,9 @@ public class MapView : MonoBehaviour {
 
     Vector3 CalculatePos(int thisRow,int thisColumn){
         float x = refPoint.x;
-        x += (thisColumn - 0.5f - 0.5f * mapColumn) * cellLength/100f;
+        x += (thisColumn + 0.5f - 0.5f * mapColumn) * cellLength;
         float y = refPoint.y;
-        y += (thisRow - 0.5f - 0.5f * mapRow) * cellLength/100f;
+        y += (thisRow + 0.5f - 0.5f * mapRow) * cellLength;
 
         return new Vector3(x, y, 1f);
     }
