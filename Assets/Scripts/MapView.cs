@@ -47,6 +47,7 @@ public class MapView : MonoBehaviour {
                 c.transform.SetParent(_parent);
                 c.transform.localScale = cellScale;
                 c.transform.localPosition = CalculatePos(i, j);
+                c.name = i + "," + j;
             }
         }
     }
