@@ -7,18 +7,30 @@ public class MapDataCenter{
 	private int rowsCount;//thisMap.Rows
 	private int columnsCount;//thisMap.Columns
 	private MapInfo mapInfo;
-	private Grid[,] gridList;
+	public Grid[,] gridList;
 		
+    public int Rows{
+        get{ return rowsCount;}
+    }
+    public int Columns{
+        get{ return columnsCount;}
+    }
 
-
-	//public MapDataCenter(Map m)
 	public MapDataCenter(){
         mapInfo = new MapInfo ("test.map");
 		rowsCount = mapInfo.RowsCount;
 		columnsCount = mapInfo.ColumnsCount;
+        Debug.Log("Total = " + rowsCount + "," + columnsCount);
 		gridList = new Grid[rowsCount, columnsCount];
+        for (int i = 0; i < rowsCount; i++)
+        {
+            for (int j = 0; j < columnsCount; j++)
+                gridList[i, j] = new Grid(i,j);
+        }
 		InitMapData ();
 	}
+
+
 
 	void InitMapData(){
 		int bossNum = CalculateMethod.GetRandomValue (mapInfo.BossRange);
@@ -34,6 +46,7 @@ public class MapDataCenter{
 		int r1 = CalculateMethod.GetRandomValue (0, rowsCount);
 		int r2 = CalculateMethod.GetRandomValue (0, columnsCount);
 		Grid startPoint = gridList [r1, r2];
+        Debug.Log("StartPoint = " + r1 + "," + r2);
 		gridPicked.Add (startPoint);
 
 		List<Grid> neighbours;
@@ -42,10 +55,11 @@ public class MapDataCenter{
 		List<Grid> ends;
 		do {
 			for (int i = 0; i < rowsCount * columnsCount - blockNum; i++) {
-				//随机选取当前点
-				thisGrid = RandomGrid (gridPicked);
-				//查找临点
 				do {
+                    //随机选取当前点
+                    thisGrid = RandomGrid (gridPicked);
+                    Debug.Log("ThisGrid = "+thisGrid.x+","+thisGrid.y);
+                    //查找临点
 					neighbours = GridNeighbour (thisGrid);
 					for (int j = 0; j < gridPicked.Count; j++) {
 						if (neighbours.Contains (gridPicked [j]))
@@ -54,11 +68,15 @@ public class MapDataCenter{
 				} while(neighbours.Count == 0);
 				//从临点中选取下一点
 				nextGrid = RandomGrid (neighbours);
+                Debug.Log("NextGrid = "+nextGrid.x+","+nextGrid.y);
 				gridPicked.Add (nextGrid);
 
 			}
 			ends = EndPoints (gridPicked);
 		} while(ends.Count < bossNum + 1);
+
+        //取消endPoint的做法，否则在大地图会导致生成时卡死。
+        //只要Boss点不在交汇点即可（交汇点怎么定义？？）
 
         //这一部分直接把数据存到gridList里面即可
         List<Grid> bossPoints = SetGridType (ref ends, bossNum,GridType.Boss);
@@ -70,7 +88,7 @@ public class MapDataCenter{
 		RemoveExist (ref gridPicked, ref monsterPoints);
         List<Grid> eventPoints = SetGridType (ref gridPicked, eventNum,GridType.Event);
 		RemoveExist (ref gridPicked, ref eventPoints);
-        List<Grid> emptyPoints = SetGridType(ref gridPicked, gridPicked.Count, GridType.Road);
+//        List<Grid> emptyPoints = SetGridType(ref gridPicked, gridPicked.Count, GridType.Road);
 
         for (int i = 0; i < gridList.GetLength(0); i++)
         {
@@ -123,10 +141,9 @@ public class MapDataCenter{
 				if (orgs.Contains (neighbours [j]))
 					num++;
 			}
-			if (num == 1)
+            //这里的定义应该是num==1
+			if (num <=2)
 				ends.Add (orgs [i]);
-			if (num == 0)
-				Debug.Log ("Impossible!");
 		}
 		return ends;
 	}
@@ -206,7 +223,7 @@ public class MapDataCenter{
 
 }
 
-class Grid : IComparable{
+public class Grid : IComparable{
 	public int x;
 	public int y;
 	public GridType type;
@@ -215,11 +232,14 @@ class Grid : IComparable{
 	public int h;//距离终点
 	public int f;//总值
 
+    public bool isOpen;
+
 	public Grid parent;
 
 	public Grid(int x,int y){
 		this.x = x;
 		this.y = y;
+        isOpen = false;
 	}
 
 	//升序，用于Sort方法
@@ -235,14 +255,13 @@ class Grid : IComparable{
 }
 	
 
-enum GridType{
-	Block = 99,
-	Covered = 0,
-	Road = 1,
-	Normal = 2,
-    Boss=3,
-    Monster=4,
-    Event=5,
-    Enter=6
+public enum GridType{
+	Covered,
+	Road,
+    Boss,
+    Monster,
+    Event,
+    Enter,
+    Block,
 }
 

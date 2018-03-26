@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class MapView : MonoBehaviour {
 
+    public Sprite[] typeSprite;
+
     private float mapWidth;
     private float mapHeight;
     private int mapRow;
@@ -12,20 +14,9 @@ public class MapView : MonoBehaviour {
     private float cellLength;
     private Vector3 cellScale;
     private Vector3 refPoint;
+    private Grid[,] glist;
 
-    void Start(){
-        mapWidth = 1920;//width;
-        mapHeight = 1080;//height;
-        mapRow = 9;//rows;
-        mapColumn = 15;//columns;
-        cellLength = GetCellLength();
-        cellScale = GetCellScale();
-        this.refPoint = Vector3.zero;//refPoint;
-        DeployMapView();
-    }
-
-//    public MapView(){
-//    //(int width,int height,int rows,int columns,Vector3 refPoint){
+//    void Start(){
 //        mapWidth = 1920;//width;
 //        mapHeight = 1080;//height;
 //        mapRow = 9;//rows;
@@ -35,6 +26,19 @@ public class MapView : MonoBehaviour {
 //        this.refPoint = Vector3.zero;//refPoint;
 //        DeployMapView();
 //    }
+
+    public void Reset(Grid[,] glist,int rows,int columns){
+    //(int width,int height,int rows,int columns,Vector3 refPoint){
+        mapWidth = 1920;//width;
+        mapHeight = 1080;//height;
+        mapRow = rows;//rows;
+        mapColumn = columns;//columns;
+        cellLength = GetCellLength();
+        cellScale = GetCellScale();
+        this.refPoint = Vector3.zero;//refPoint;
+        this.glist=glist;
+        DeployMapView();
+    }
 
     public void DeployMapView(){
         Object mapCell = Resources.Load("mapCell");
@@ -48,6 +52,8 @@ public class MapView : MonoBehaviour {
                 c.transform.localScale = cellScale;
                 c.transform.localPosition = CalculatePos(i, j);
                 c.name = i + "," + j;
+                Debug.Log("Deploying " + i + "," + j);
+                c.GetComponent<Image>().sprite = typeSprite[(int)(glist[i, j].type)];
             }
         }
     }

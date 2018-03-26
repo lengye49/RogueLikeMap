@@ -26,9 +26,9 @@ public class MapInfo{
         RowsCount = 10;
         ColumnsCount = 10;
         BossRange="1|1";
-        BlockRange="45|50";
-        MonsterRange="15|20";
-        EventRange="8|10";
+        BlockRange="30|50";
+        MonsterRange="5|10";
+        EventRange="2|5";
 	}
 }
 
