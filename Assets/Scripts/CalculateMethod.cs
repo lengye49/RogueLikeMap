@@ -24,6 +24,16 @@ public class CalculateMethod{
 		return Random.Range (min, max);
 	}
 
+    public static int GetRandomValueForNewGrid(int count){
+        Dictionary<int,int> d = new Dictionary<int, int>();
+        for (int i = 0; i < count; i++)
+        {
+            d.Add(i, 100 + 10 * i);
+        }
+        int index = GetRandomValue(d);
+        return index;
+    }
+
 	/// <summary>
 	/// 根据权重随机选1,取不到则为-1,需要处理-1的情况
 	/// </summary>

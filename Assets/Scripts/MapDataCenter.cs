@@ -49,7 +49,7 @@ public class MapDataCenter{
         Debug.Log("StartPoint = " + r1 + "," + r2);
 		gridPicked.Add (startPoint);
 
-		List<Grid> neighbours;
+		
 		Grid thisGrid;
 		Grid nextGrid;
 		List<Grid> ends;
@@ -58,10 +58,12 @@ public class MapDataCenter{
 		do {
 			
 			for (int i = 0; i < rowsCount * columnsCount - blockNum; i++) {
-				loopingCount=0;
+				
+                List<Grid> neighbours = new List<Grid>();
+                loopingCount=0;
 				do {
 					loopingCount++;
-					if(loopingCount>=1000){
+					if(loopingCount>=10000){
 						Debug.Log("InitMapData Fail!");
 						break;
 					}
@@ -77,7 +79,6 @@ public class MapDataCenter{
 				//从临点中选取下一点
 				nextGrid = RandomGrid (neighbours);
 				gridPicked.Add (nextGrid);
-
 			}
 			ends = EndPoints (gridPicked);
 		} while(ends.Count < bossNum);
@@ -125,7 +126,7 @@ public class MapDataCenter{
 	}
 
 	Grid RandomGrid(List<Grid> gridPool){
-		int r = CalculateMethod.GetRandomValue (0, gridPool.Count);
+		int r = CalculateMethod.GetRandomValueForNewGrid ( gridPool.Count);
 		return gridPool [r];
 	}
 
