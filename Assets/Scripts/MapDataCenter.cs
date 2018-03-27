@@ -34,13 +34,13 @@ public class MapDataCenter{
 
 	void InitMapData(){
 		int bossNum = CalculateMethod.GetRandomValue (mapInfo.BossRange);
-        Debug.Log("bossNum = " + bossNum);
+//        Debug.Log("bossNum = " + bossNum);
 		int monsterNum = CalculateMethod.GetRandomValue (mapInfo.MonsterRange);
-        Debug.Log("monsterNum = " + monsterNum);
+//        Debug.Log("monsterNum = " + monsterNum);
 		int eventNum = CalculateMethod.GetRandomValue (mapInfo.EventRange);
-        Debug.Log("eventNum = " + eventNum);
+//        Debug.Log("eventNum = " + eventNum);
 		int blockNum = CalculateMethod.GetRandomValue (mapInfo.BlockRange);
-        Debug.Log("blockNum = " + blockNum);
+//        Debug.Log("blockNum = " + blockNum);
 		List<Grid> gridPicked = new List<Grid> ();
 
 		int r1 = CalculateMethod.GetRandomValue (0, rowsCount);
@@ -53,12 +53,20 @@ public class MapDataCenter{
 		Grid thisGrid;
 		Grid nextGrid;
 		List<Grid> ends;
+
+		int loopingCount = 0;
 		do {
+			
 			for (int i = 0; i < rowsCount * columnsCount - blockNum; i++) {
+				loopingCount=0;
 				do {
+					loopingCount++;
+					if(loopingCount>=1000){
+						Debug.Log("InitMapData Fail!");
+						break;
+					}
                     //随机选取当前点
                     thisGrid = RandomGrid (gridPicked);
-                    Debug.Log("ThisGrid = "+thisGrid.x+","+thisGrid.y);
                     //查找临点
 					neighbours = GridNeighbour (thisGrid);
 					for (int j = 0; j < gridPicked.Count; j++) {
@@ -68,27 +76,23 @@ public class MapDataCenter{
 				} while(neighbours.Count == 0);
 				//从临点中选取下一点
 				nextGrid = RandomGrid (neighbours);
-                Debug.Log("NextGrid = "+nextGrid.x+","+nextGrid.y);
 				gridPicked.Add (nextGrid);
 
 			}
 			ends = EndPoints (gridPicked);
-		} while(ends.Count < bossNum + 1);
-
-        //取消endPoint的做法，否则在大地图会导致生成时卡死。
-        //只要Boss点不在交汇点即可（交汇点怎么定义？？）
+		} while(ends.Count < bossNum);
 
         //这一部分直接把数据存到gridList里面即可
         List<Grid> bossPoints = SetGridType (ref ends, bossNum,GridType.Boss);
 		RemoveExist (ref gridPicked, ref bossPoints);
 		RemoveExist (ref ends, ref bossPoints);
-        List<Grid> enterPoints = SetGridType (ref ends, 1,GridType.Enter);
+        List<Grid> enterPoints = SetGridType (ref gridPicked, 1,GridType.Enter);
 		RemoveExist (ref gridPicked, ref enterPoints);
         List<Grid> monsterPoints = SetGridType (ref gridPicked, monsterNum,GridType.Monster);
 		RemoveExist (ref gridPicked, ref monsterPoints);
         List<Grid> eventPoints = SetGridType (ref gridPicked, eventNum,GridType.Event);
 		RemoveExist (ref gridPicked, ref eventPoints);
-//        List<Grid> emptyPoints = SetGridType(ref gridPicked, gridPicked.Count, GridType.Road);
+        List<Grid> emptyPoints = SetGridType(ref gridPicked, gridPicked.Count, GridType.Road);
 
         for (int i = 0; i < gridList.GetLength(0); i++)
         {
@@ -141,8 +145,7 @@ public class MapDataCenter{
 				if (orgs.Contains (neighbours [j]))
 					num++;
 			}
-            //这里的定义应该是num==1
-			if (num <=2)
+			if (num <=1)
 				ends.Add (orgs [i]);
 		}
 		return ends;

@@ -23,10 +23,10 @@ public class MapInfo{
 
 	public MapInfo(string mapId){
         MapName = mapId;
-        RowsCount = 10;
-        ColumnsCount = 10;
+        RowsCount = 7;
+        ColumnsCount = 7;
         BossRange="1|1";
-        BlockRange="30|50";
+        BlockRange="12|15";
         MonsterRange="5|10";
         EventRange="2|5";
 	}
