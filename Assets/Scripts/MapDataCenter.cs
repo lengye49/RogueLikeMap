@@ -21,16 +21,10 @@ public class MapDataCenter{
 		rowsCount = mapInfo.RowsCount;
 		columnsCount = mapInfo.ColumnsCount;
         Debug.Log("Total = " + rowsCount + "," + columnsCount);
-		gridList = new Grid[rowsCount, columnsCount];
-        for (int i = 0; i < rowsCount; i++)
-        {
-            for (int j = 0; j < columnsCount; j++)
-                gridList[i, j] = new Grid(i,j);
-        }
+		
 		InitMapData ();
 	}
-
-
+        
 
 	void InitMapData(){
 		int bossNum = CalculateMethod.GetRandomValue (mapInfo.BossRange);
@@ -41,46 +35,42 @@ public class MapDataCenter{
 //        Debug.Log("eventNum = " + eventNum);
 		int blockNum = CalculateMethod.GetRandomValue (mapInfo.BlockRange);
 //        Debug.Log("blockNum = " + blockNum);
-		List<Grid> gridPicked = new List<Grid> ();
-
-		int r1 = CalculateMethod.GetRandomValue (0, rowsCount);
-		int r2 = CalculateMethod.GetRandomValue (0, columnsCount);
-		Grid startPoint = gridList [r1, r2];
-        Debug.Log("StartPoint = " + r1 + "," + r2);
-		gridPicked.Add (startPoint);
+		List<Grid> gridPicked;
+        Stack gridStack;
+        Grid thisGrid;
+        Grid nextGrid;
+        List<Grid> neighbours;
+        List<Grid> ends;
 
 		
-		Grid thisGrid;
-		Grid nextGrid;
-		List<Grid> ends;
-
-		int loopingCount = 0;
+        UnityEngine.Random.InitState((int)Time.time);
 		do {
-			thisGrid = RandomGrid (gridPicked);
-			for (int i = 0; i < rowsCount * columnsCount - blockNum; i++) {
-                List<Grid> neighbours = new List<Grid>();
+            InitGridList();
 
-                loopingCount=0;
+            int r1 = CalculateMethod.GetRandomValue (0, rowsCount);
+            int r2 = CalculateMethod.GetRandomValue (0, columnsCount);
+            gridStack=new Stack();
+            gridPicked=new List<Grid>();
+            thisGrid = gridList[r1, r2];
+            thisGrid.isPicked = true;
+            gridPicked.Add (thisGrid);
+            gridStack.Push(thisGrid);
+			for (int i = 0; i < rowsCount * columnsCount - blockNum; i++) {
+                Debug.Log("i = "+i);
+                neighbours = new List<Grid>();
 				do {
-					if(loopingCount>=100){
-						Debug.Log("InitMapData Fail!");
-						break;
-					}
-                    //随机选取当前点
-					if(loopingCount>0)
-						thisGrid = RandomGrid (gridPicked);
-                    //查找临点
-					neighbours = GridNeighbour (thisGrid);
-					for (int j = 0; j < gridPicked.Count; j++) {
-						if (neighbours.Contains (gridPicked [j]))
-							neighbours.Remove (gridPicked [j]);
-					}
-					loopingCount++;
+                    thisGrid = gridStack.Pop() as Grid;
+                    Debug.Log("thisGrid");
+                    thisGrid.Print();
+					neighbours = UnpickedGridNeighbour (thisGrid);
 				} while(neighbours.Count == 0);
 				//从临点中选取下一点
 				nextGrid = RandomGrid (neighbours);
-				thisGrid=nextGrid;
-				gridPicked.Add (nextGrid);
+                gridStack.Push(thisGrid);
+                gridStack.Push(nextGrid);
+
+                nextGrid.isPicked=true;
+                gridPicked.Add(nextGrid);
 			}
 			ends = EndPoints (gridPicked);
 		} while(ends.Count < bossNum);
@@ -105,6 +95,15 @@ public class MapDataCenter{
             }
         }
 	}
+
+    void InitGridList(){
+        gridList = new Grid[rowsCount, columnsCount];
+        for (int i = 0; i < rowsCount; i++)
+        {
+            for (int j = 0; j < columnsCount; j++)
+                gridList[i, j] = new Grid(i,j);
+        }
+    }
 
 	void RemoveExist(ref List<Grid> org,ref List<Grid> exist){
 		for (int i = 0; i < exist.Count; i++) {
@@ -227,6 +226,32 @@ public class MapDataCenter{
 		return neighbour;
 	}
 
+    List<Grid> UnpickedGridNeighbour(Grid org){
+        Debug.Log("Choosing Neighbour...");
+        List<Grid> neighbour = new List<Grid> ();
+        if (org.x != 0 && !gridList[org.x - 1, org.y].isPicked)
+        {
+            neighbour.Add(gridList[org.x - 1, org.y]);
+            gridList[org.x - 1, org.y].Print();
+        }
+        if (org.y != 0 && !gridList[org.x, org.y - 1].isPicked)
+        {
+            neighbour.Add(gridList[org.x, org.y - 1]);
+            gridList[org.x, org.y - 1].Print();
+        }
+        if (org.x != columnsCount - 1 && !gridList[org.x + 1, org.y].isPicked)
+        {
+            neighbour.Add(gridList[org.x + 1, org.y]);
+            gridList[org.x + 1, org.y].Print();
+        }
+        if (org.y != rowsCount - 1 && !gridList[org.x, org.y + 1].isPicked)
+        {
+            neighbour.Add(gridList[org.x, org.y + 1]);
+            gridList[org.x, org.y + 1].Print();
+        }
+        return neighbour;
+    }
+
 }
 
 public class Grid : IComparable{
@@ -239,14 +264,14 @@ public class Grid : IComparable{
 	public int f;//总值
 
     public bool isOpen;
-//	public bool isPicked;
+	public bool isPicked;
 	public Grid parent;
 
 	public Grid(int x,int y){
 		this.x = x;
 		this.y = y;
         isOpen = false;
-//		isPicked = false;
+		isPicked = false;
 	}
 
 	//升序，用于Sort方法
@@ -258,6 +283,10 @@ public class Grid : IComparable{
 			return 1;
 		return 0;
 	}
+
+    public void Print(){
+        Debug.Log(" = [" + x + "," + y + "]");
+    }
 
 }
 	
