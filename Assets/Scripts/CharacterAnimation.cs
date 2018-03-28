@@ -17,8 +17,8 @@ public class CharacterAnimation : MonoBehaviour
     public List<Sprite> SpriteFrames;
 
     private bool IsPlaying = true;
-    private bool AutoPlay = true;
-    private bool Loop = true;
+//    private bool AutoPlay = true;
+//    private bool Loop = true;
 
     private bool isChanged = false;
 
@@ -32,19 +32,20 @@ public class CharacterAnimation : MonoBehaviour
     void Start()
     {
         Rest();
-        t = 0f;
     }
 
-    void Rest(){
+    public void Rest(){
         isChanged = true;
         startFrame = 0;
         endFrame = 3;
+		FPS = 4;
     }
 
-    void Run(){
+    public void Run(){
         isChanged = true;
         startFrame = 4;
         endFrame = 11;
+		FPS = 8;
     }
 
     private void SetSprite(int idx)
@@ -61,17 +62,8 @@ public class CharacterAnimation : MonoBehaviour
 //        IsPlaying = true;
 //        Foward = false;
 //    }
-    bool isRunning=false;
     void Update()
     {
-        t += Time.deltaTime;
-       
-        if (t > 4.0f && !isRunning)
-        {
-            Run();
-            isRunning = true;
-        }
-
 
         if (!IsPlaying || startFrame == endFrame)
         {

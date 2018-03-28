@@ -8,6 +8,7 @@ public class MapDataCenter{
 	private int columnsCount;//thisMap.Columns
 	private MapInfo mapInfo;
 	public Grid[,] gridList;
+	public Grid enterGrid;
 		
     public int Rows{
         get{ return rowsCount;}
@@ -28,13 +29,10 @@ public class MapDataCenter{
 
 	void InitMapData(){
 		int bossNum = CalculateMethod.GetRandomValue (mapInfo.BossRange);
-//        Debug.Log("bossNum = " + bossNum);
 		int monsterNum = CalculateMethod.GetRandomValue (mapInfo.MonsterRange);
-//        Debug.Log("monsterNum = " + monsterNum);
 		int eventNum = CalculateMethod.GetRandomValue (mapInfo.EventRange);
-//        Debug.Log("eventNum = " + eventNum);
 		int blockNum = CalculateMethod.GetRandomValue (mapInfo.BlockRange);
-//        Debug.Log("blockNum = " + blockNum);
+
 		List<Grid> gridPicked;
         Stack gridStack;
         Grid thisGrid;
@@ -55,16 +53,13 @@ public class MapDataCenter{
             thisGrid.isPicked = true;
             gridPicked.Add (thisGrid);
             gridStack.Push(thisGrid);
+
 			for (int i = 0; i < rowsCount * columnsCount - blockNum; i++) {
-                Debug.Log("i = "+i);
                 neighbours = new List<Grid>();
 				do {
                     thisGrid = gridStack.Pop() as Grid;
-                    Debug.Log("thisGrid");
-                    thisGrid.Print();
 					neighbours = UnpickedGridNeighbour (thisGrid);
 				} while(neighbours.Count == 0);
-				//从临点中选取下一点
 				nextGrid = RandomGrid (neighbours);
                 gridStack.Push(thisGrid);
                 gridStack.Push(nextGrid);
@@ -75,25 +70,20 @@ public class MapDataCenter{
 			ends = EndPoints (gridPicked);
 		} while(ends.Count < bossNum);
 
+
+
         //这一部分直接把数据存到gridList里面即可
         List<Grid> bossPoints = SetGridType (ref ends, bossNum,GridType.Boss);
 		RemoveExist (ref gridPicked, ref bossPoints);
 		RemoveExist (ref ends, ref bossPoints);
         List<Grid> enterPoints = SetGridType (ref gridPicked, 1,GridType.Enter);
+		enterGrid = enterPoints [0];
 		RemoveExist (ref gridPicked, ref enterPoints);
         List<Grid> monsterPoints = SetGridType (ref gridPicked, monsterNum,GridType.Monster);
 		RemoveExist (ref gridPicked, ref monsterPoints);
         List<Grid> eventPoints = SetGridType (ref gridPicked, eventNum,GridType.Event);
 		RemoveExist (ref gridPicked, ref eventPoints);
         List<Grid> emptyPoints = SetGridType(ref gridPicked, gridPicked.Count, GridType.Road);
-
-        for (int i = 0; i < gridList.GetLength(0); i++)
-        {
-            for (int j = 0; j < gridList.GetLength(1); j++)
-            {
-                Debug.Log("Grid " + i + "," + j + " type = " + gridList[i, j].type);
-            }
-        }
 	}
 
     void InitGridList(){
@@ -155,20 +145,19 @@ public class MapDataCenter{
 
 	private ArrayList openList;
 	private ArrayList closeList;
+	private List<Grid> path;
 	private string road;
-
-
 	/// <summary>
 	/// 简单的A星寻路算法,不走对角线
 	/// </summary>
 	/// <returns>The road.</returns>
 	/// <param name="start">Start.</param>
 	/// <param name="end">End.</param>
-	public void FindPath(int startX,int startY,int endX,int endY){
-
+	public List<Grid> FindPath(int startX,int startY,int endX,int endY){
+		road = "";
+		path = new List<Grid> ();
 		openList = new ArrayList ();
 		closeList = new ArrayList ();
-		road = "";
 
 		openList.Add (gridList [startX, startY]);
 		Grid current = openList [0] as Grid;
@@ -176,10 +165,8 @@ public class MapDataCenter{
 		while (openList.Count > 0 && (startX != endX || startY != endY)) {
 			current = openList [0] as Grid;
 			if (current.x == endX && current.y == endY) {
-				Debug.Log ("PathFound!");
 				GenerateRoad(current);
-				Debug.Log (road);
-				return;
+				return path;
 			}
 			foreach (Grid _grid in GridNeighbour(current)) {
 				if (_grid.type != GridType.Block && !closeList.Contains (_grid)) {
@@ -205,10 +192,12 @@ public class MapDataCenter{
 			if (openList.Count == 0)
 				Debug.Log ("UnReachable Point!");
 		}
+		return path;
 	}
 
 	void GenerateRoad(Grid g){
 		road += "(" + g.x + "," + g.y + ")";
+		path.Add (g);
 		if (g.parent != null)
 			GenerateRoad (g.parent);
 	}	
@@ -227,27 +216,22 @@ public class MapDataCenter{
 	}
 
     List<Grid> UnpickedGridNeighbour(Grid org){
-        Debug.Log("Choosing Neighbour...");
         List<Grid> neighbour = new List<Grid> ();
         if (org.x != 0 && !gridList[org.x - 1, org.y].isPicked)
         {
             neighbour.Add(gridList[org.x - 1, org.y]);
-            gridList[org.x - 1, org.y].Print();
         }
         if (org.y != 0 && !gridList[org.x, org.y - 1].isPicked)
         {
             neighbour.Add(gridList[org.x, org.y - 1]);
-            gridList[org.x, org.y - 1].Print();
         }
         if (org.x != columnsCount - 1 && !gridList[org.x + 1, org.y].isPicked)
         {
             neighbour.Add(gridList[org.x + 1, org.y]);
-            gridList[org.x + 1, org.y].Print();
         }
         if (org.y != rowsCount - 1 && !gridList[org.x, org.y + 1].isPicked)
         {
             neighbour.Add(gridList[org.x, org.y + 1]);
-            gridList[org.x, org.y + 1].Print();
         }
         return neighbour;
     }

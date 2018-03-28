@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+//这个脚本不能直接挂载，需要动态生成，因为会有多个地图同时生成。
+
 public class MapView : MonoBehaviour {
 
     public Sprite[] typeSprite;
@@ -52,7 +54,6 @@ public class MapView : MonoBehaviour {
                 c.transform.localScale = cellScale;
                 c.transform.localPosition = CalculatePos(i, j);
                 c.name = i + "," + j;
-                Debug.Log("Deploying " + i + "," + j);
                 c.GetComponent<Image>().sprite = typeSprite[(int)(glist[i, j].type)];
             }
         }
@@ -77,5 +78,14 @@ public class MapView : MonoBehaviour {
 
         return new Vector3(x, y, 1f);
     }
+
+	public Vector3 CalculatePos(Grid g){
+		float x = refPoint.x;
+		x += (g.x + 0.5f - 0.5f * mapColumn) * cellLength;
+		float y = refPoint.y;
+		y += (g.y + 0.5f - 0.5f * mapRow) * cellLength;
+
+		return new Vector3(x, y, 1f);
+	}
 
 }
