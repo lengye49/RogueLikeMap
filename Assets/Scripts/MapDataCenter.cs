@@ -56,28 +56,30 @@ public class MapDataCenter{
 
 		int loopingCount = 0;
 		do {
-			
+			thisGrid = RandomGrid (gridPicked);
 			for (int i = 0; i < rowsCount * columnsCount - blockNum; i++) {
-				
                 List<Grid> neighbours = new List<Grid>();
+
                 loopingCount=0;
 				do {
-					loopingCount++;
-					if(loopingCount>=10000){
+					if(loopingCount>=100){
 						Debug.Log("InitMapData Fail!");
 						break;
 					}
                     //随机选取当前点
-                    thisGrid = RandomGrid (gridPicked);
+					if(loopingCount>0)
+						thisGrid = RandomGrid (gridPicked);
                     //查找临点
 					neighbours = GridNeighbour (thisGrid);
 					for (int j = 0; j < gridPicked.Count; j++) {
 						if (neighbours.Contains (gridPicked [j]))
 							neighbours.Remove (gridPicked [j]);
 					}
+					loopingCount++;
 				} while(neighbours.Count == 0);
 				//从临点中选取下一点
 				nextGrid = RandomGrid (neighbours);
+				thisGrid=nextGrid;
 				gridPicked.Add (nextGrid);
 			}
 			ends = EndPoints (gridPicked);
@@ -237,13 +239,14 @@ public class Grid : IComparable{
 	public int f;//总值
 
     public bool isOpen;
-
+//	public bool isPicked;
 	public Grid parent;
 
 	public Grid(int x,int y){
 		this.x = x;
 		this.y = y;
         isOpen = false;
+//		isPicked = false;
 	}
 
 	//升序，用于Sort方法

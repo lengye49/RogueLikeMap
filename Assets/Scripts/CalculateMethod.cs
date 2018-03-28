@@ -8,6 +8,8 @@ public class CalculateMethod{
 	/// <returns>The random value.</returns>
 	/// <param name="range">Range格式 1|8 .</param>
 	public static int GetRandomValue(string range){
+		if (!range.Contains ("|"))
+			return int.Parse (range);
 		string[] s = range.Split ('|');
 		int min = int.Parse (s [0]);
 		int max = int.Parse (s [1]);
