@@ -57,6 +57,7 @@ public class PlayerController : MonoBehaviour {
 
 	public void MoveTo(Grid target){
         Debug.Log("Looking for Path...");
+        _path = new List<Grid>();
 		_path = _data.FindPath (target.x, target.y, _thisGrid.x, _thisGrid.y);
 		if (_path.Count <= 0)
 			return;

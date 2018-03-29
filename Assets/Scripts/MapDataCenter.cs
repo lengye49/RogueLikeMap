@@ -159,6 +159,7 @@ public class MapDataCenter{
 		path = new List<Grid> ();
 		openList = new ArrayList ();
 		closeList = new ArrayList ();
+        ResetGridParent();
 
 		openList.Add (gridList [startX, startY]);
 		Grid current = openList [0] as Grid;
@@ -204,6 +205,14 @@ public class MapDataCenter{
 		if (g.parent != null)
 			GenerateRoad (g.parent);
 	}	
+
+    void ResetGridParent(){
+        for (int i = 0; i < rowsCount; i++)
+        {
+            for (int j = 0; j < columnsCount; j++)
+                gridList[i, j].parent = null;
+        }
+    }
 
 	List<Grid> GridNeighbour(Grid org){
 		List<Grid> neighbour = new List<Grid> ();
