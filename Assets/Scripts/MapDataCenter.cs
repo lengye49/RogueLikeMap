@@ -154,12 +154,12 @@ public class MapDataCenter{
 	/// <param name="start">Start.</param>
 	/// <param name="end">End.</param>
 	public List<Grid> FindPath(int startX,int startY,int endX,int endY){
-        Debug.Log("A* Started!");
+		Debug.Log ("A* Started! Looking" + endX + "," + endY + "-->" + startX + "," + startY);
 		road = "";
 		path = new List<Grid> ();
 		openList = new ArrayList ();
 		closeList = new ArrayList ();
-        ResetGridParent();
+        ResetGridState();
 
 		openList.Add (gridList [startX, startY]);
 		Grid current = openList [0] as Grid;
@@ -206,11 +206,15 @@ public class MapDataCenter{
 			GenerateRoad (g.parent);
 	}	
 
-    void ResetGridParent(){
+    void ResetGridState(){
         for (int i = 0; i < rowsCount; i++)
         {
-            for (int j = 0; j < columnsCount; j++)
-                gridList[i, j].parent = null;
+			for (int j = 0; j < columnsCount; j++) {
+				gridList [i, j].parent = null;
+				gridList [i, j].g = 0;
+				gridList [i, j].f = 0;
+				gridList [i, j].h = 0;
+			}
         }
     }
 
