@@ -154,6 +154,7 @@ public class MapDataCenter{
 	/// <param name="start">Start.</param>
 	/// <param name="end">End.</param>
 	public List<Grid> FindPath(int startX,int startY,int endX,int endY){
+        Debug.Log("A* Started!");
 		road = "";
 		path = new List<Grid> ();
 		openList = new ArrayList ();
@@ -165,7 +166,9 @@ public class MapDataCenter{
 		while (openList.Count > 0 && (startX != endX || startY != endY)) {
 			current = openList [0] as Grid;
 			if (current.x == endX && current.y == endY) {
+                Debug.Log("Path Found!");
 				GenerateRoad(current);
+                Debug.Log(road);
 				return path;
 			}
 			foreach (Grid _grid in GridNeighbour(current)) {
