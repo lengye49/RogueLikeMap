@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 //这个脚本不能直接挂载，需要动态生成，因为会有多个地图同时生成。
+//离开地图时需要销毁地图
 
 public class MapView : MonoBehaviour {
 
@@ -17,6 +18,7 @@ public class MapView : MonoBehaviour {
     private Vector3 cellScale;
     private Vector3 refPoint;
     private Grid[,] glist;
+    private List<GameObject> cellList;
 
 //    void Start(){
 //        mapWidth = 1920;//width;
@@ -39,6 +41,7 @@ public class MapView : MonoBehaviour {
         cellScale = GetCellScale();
         this.refPoint = Vector3.zero;//refPoint;
         this.glist=glist;
+        cellList = new List<GameObject>();
         DeployMapView();
     }
 
@@ -54,11 +57,23 @@ public class MapView : MonoBehaviour {
                 c.transform.localScale = cellScale;
                 c.transform.localPosition = CalculatePos(i, j);
                 c.name = j + "," + i;
-                c.GetComponent<Image>().sprite = typeSprite[(int)(glist[i, j].type)];
+                cellList.Add(c);
+                ShowMapImage(c, 0);
             }
         }
     }
 
+    void ShowMapImage(GameObject g, int imageIndex){
+        g.GetComponent<Image>().sprite = typeSprite[imageIndex];
+    }
+
+    public void ChangeCellView(Grid g){
+        int imageIndex = 0;
+        if (g.isOpen)
+            imageIndex = (int)(g.type);
+        GameObject o =cellList[ g.x + mapColumn * g.y];
+        ShowMapImage(o, imageIndex);
+    }
 
     float GetCellLength(){
         float sideWidth = mapWidth / mapColumn;

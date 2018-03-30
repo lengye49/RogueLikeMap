@@ -36,11 +36,26 @@ public class PlayerController : MonoBehaviour {
 	}
 		
 	void SetPosition(Grid g){
-		g.Print ();
+        g.Print();
+        OpenCell(g);
+        List<Grid> nb = _data.GridNeighbour(g);
+        for (int i = 0; i < nb.Count; i++)
+            OpenCell(nb[i]);
+
+        Debug.Log("*************" + _player.localPosition);
 		Vector3 pos = _view.CalculatePos (_thisGrid);
-        Debug.Log(pos);
-		_player.localPosition = pos;
+        _player.DOLocalMove(pos, 0.01f, true);
+//        _player.localPosition = pos;
+        Debug.Log("*************" + _player.localPosition);
 	}
+
+    void OpenCell(Grid g){
+        if (!g.isOpen)
+        {
+            g.isOpen = true;
+            _view.ChangeCellView(g);
+        }
+    }
 
     void Update(){
         if (!IsCover && _mask.activeSelf)
@@ -54,8 +69,10 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+	public void TargetingGrid(Grid target){
+        //if isOpen=false, don't respond
+        //if isWalkable=false，直接走，在movingByPath里面判断isWalkable,如果=false直接停止
 
-	public void MoveTo(Grid target){
         Debug.Log("Looking for Path...");
         _path = new List<Grid>();
 		_path = _data.FindPath (target.x, target.y, _thisGrid.x, _thisGrid.y);
@@ -80,7 +97,7 @@ public class PlayerController : MonoBehaviour {
 
         Vector3 nextPos = _view.CalculatePos(nextGrid);
         Debug.Log(nextPos);
-        _player.DOLocalMove(nextPos, _interval, true);
+        _player.DOLocalMove(nextPos, _interval, false);
 		_animation.Run ();//需要根据方向判断朝向,用grid.parent和grid来判断方向
 
 		_thisGrid = nextGrid;

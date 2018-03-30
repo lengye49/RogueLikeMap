@@ -74,15 +74,14 @@ public class MapDataCenter{
 
         //这一部分直接把数据存到gridList里面即可
         List<Grid> bossPoints = SetGridType (ref ends, bossNum,GridType.Boss);
-		RemoveExist (ref gridPicked, ref bossPoints);
-		RemoveExist (ref ends, ref bossPoints);
+		RemoveExist (ref gridPicked, bossPoints);
         List<Grid> enterPoints = SetGridType (ref gridPicked, 1,GridType.Enter);
 		enterGrid = enterPoints [0];
-		RemoveExist (ref gridPicked, ref enterPoints);
+		RemoveExist (ref gridPicked, enterPoints);
         List<Grid> monsterPoints = SetGridType (ref gridPicked, monsterNum,GridType.Monster);
-		RemoveExist (ref gridPicked, ref monsterPoints);
+		RemoveExist (ref gridPicked, monsterPoints);
         List<Grid> eventPoints = SetGridType (ref gridPicked, eventNum,GridType.Event);
-		RemoveExist (ref gridPicked, ref eventPoints);
+		RemoveExist (ref gridPicked, eventPoints);
         List<Grid> emptyPoints = SetGridType(ref gridPicked, gridPicked.Count, GridType.Road);
 	}
 
@@ -95,7 +94,7 @@ public class MapDataCenter{
         }
     }
 
-	void RemoveExist(ref List<Grid> org,ref List<Grid> exist){
+	void RemoveExist(ref List<Grid> org,List<Grid> exist){
 		for (int i = 0; i < exist.Count; i++) {
 			try{
 				org.Remove (exist [i]);
@@ -155,8 +154,12 @@ public class MapDataCenter{
 	/// <param name="end">End.</param>
 	public List<Grid> FindPath(int startX,int startY,int endX,int endY){
 		Debug.Log ("A* Started! Looking" + endX + "," + endY + "-->" + startX + "," + startY);
+        path = new List<Grid> ();
+
+        if (!gridList[startX, startY].isOpen)
+            return path;
+
 		road = "";
-		path = new List<Grid> ();
 		openList = new ArrayList ();
 		closeList = new ArrayList ();
         ResetGridState();
@@ -173,7 +176,7 @@ public class MapDataCenter{
 				return path;
 			}
 			foreach (Grid _grid in GridNeighbour(current)) {
-				if (_grid.type != GridType.Block && !closeList.Contains (_grid)) {
+                if (_grid.IsWalkable() && !closeList.Contains (_grid)) {
 
 					int g = current.g + 1;
 					if (_grid.g == 0 || _grid.g > g) {
@@ -218,7 +221,7 @@ public class MapDataCenter{
         }
     }
 
-	List<Grid> GridNeighbour(Grid org){
+	public List<Grid> GridNeighbour(Grid org){
 		List<Grid> neighbour = new List<Grid> ();
 		if (org.x != 0)
 			neighbour.Add (gridList [org.x - 1, org.y]);
@@ -273,6 +276,14 @@ public class Grid : IComparable{
         isOpen = false;
 		isPicked = false;
 	}
+        
+    public bool IsWalkable(){
+        if (!this.isOpen)
+            return false;
+        if (this.type == GridType.Road || this.type == GridType.Enter)
+            return true;
+        return false;
+    }
 
 	//升序，用于Sort方法
 	public int CompareTo(object obj){
