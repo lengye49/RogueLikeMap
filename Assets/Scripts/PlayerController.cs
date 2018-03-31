@@ -24,6 +24,8 @@ public class PlayerController : MonoBehaviour {
 
 	void Start () {
 		_data = new MapDataCenter ();
+
+		//需要把map做成prefab，这里new一个新的出来。这样以后有新地图就可以直接new map
 		_view = GetComponentInChildren<MapView>();
 		_view.Reset(_data.gridList,_data.Rows,_data.Columns);
 

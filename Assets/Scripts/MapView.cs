@@ -8,8 +8,7 @@ using UnityEngine.UI;
 
 public class MapView : MonoBehaviour {
 
-    public Sprite[] typeSprite;
-
+    private Sprite[] typeSprite;
     private float mapWidth;
     private float mapHeight;
     private int mapRow;
@@ -20,19 +19,7 @@ public class MapView : MonoBehaviour {
     private Grid[,] glist;
     private List<GameObject> cellList;
 
-//    void Start(){
-//        mapWidth = 1920;//width;
-//        mapHeight = 1080;//height;
-//        mapRow = 9;//rows;
-//        mapColumn = 15;//columns;
-//        cellLength = GetCellLength();
-//        cellScale = GetCellScale();
-//        this.refPoint = Vector3.zero;//refPoint;
-//        DeployMapView();
-//    }
-
     public void Reset(Grid[,] glist,int rows,int columns){
-    //(int width,int height,int rows,int columns,Vector3 refPoint){
         mapWidth = 1920;//width;
         mapHeight = 1080;//height;
         mapRow = rows;//rows;
@@ -42,6 +29,7 @@ public class MapView : MonoBehaviour {
         this.refPoint = Vector3.zero;//refPoint;
         this.glist=glist;
         cellList = new List<GameObject>();
+		typeSprite = GetComponentInParent<Configs> ().itemSpriteList;
         DeployMapView();
     }
 
